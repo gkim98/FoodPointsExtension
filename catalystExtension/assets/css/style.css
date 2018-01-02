@@ -67,6 +67,18 @@ body {
     margin: 0 0 10px 0;
 }
 
+#middleDiv {
+    margin: 10px auto 5px auto;
+    margin-bottom: 10px;
+    width: 220px;
+}
+
+#middleText {
+    font-weight: 800;
+}
+
+
+
 /* gradient bar for weekly food points*/
 #weeklyPoints {
     width: 175px;

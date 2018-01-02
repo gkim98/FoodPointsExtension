@@ -52,9 +52,10 @@ document.getElementById("loadPoints").addEventListener('click', () => {
         editContent(results[0]);
         //convert points to float
         var pointStr = results[0].replace('$','');
-        var points = parseFloat(pointStr);
-        calculateTargetPointsDay(points);
-        pointsPerDay(points);
+        var pointComma = pointStr.replace(',','');
+        var points = parseFloat(pointComma);
+        var targetPoints = calculateTargetPointsDay(points);
+        pointsPerDay(points,targetPoints);
     });
 });
 
@@ -75,16 +76,17 @@ function calculateTargetPointsDay(points){
         var targetPoints = totalPoints - getDateDifference() * pointsPerDay;
         console.log(targetPoints);
         if(targetPoints<points){
-            $('#onTargetText span').text("You're above the target amount");
+            $('#onTargetText span').text("You're $"+(points - targetPoints).toFixed(2)+" above the target amount");
             $('#onTargetText span').css('color', 'green');
         }
         else if(targetPoints>points){
-            $('#onTargetText span').text("You're below the target amount");
+            $('#onTargetText span').text("You're $"+(targetPoints - points).toFixed(2)+" below the target amount");
             $('#onTargetText span').css('color', 'red');
         }
+        return targetPoints;
 }
 
-function pointsPerDay(points){
+function pointsPerDay(points,targetPoints){
         var daysRemaining = 109 - getDateDifference();
         console.log(daysRemaining);
         var pointsRem = points / daysRemaining;
@@ -92,7 +94,15 @@ function pointsPerDay(points){
         $('#pointsPerDayText span').text("$" + pointsRem.toFixed(2));
         var pointsRemWeek = pointsRem * 7;
         $('#pointsPerWeekText span').text("$" + pointsRemWeek.toFixed(2));
-        $('#limit').text("$" + pointsRem.toFixed(2));
+        if (points > targetPoints) {
+            $('#limit').text("$" + pointsRem.toFixed(2));
+            $("#longArrow").css("margin-left","120px")
+        } else {
+            var targetPointsRem = targetPoints / daysRemaining;
+            $('#limit').text("$" + targetPointsRem.toFixed(2));
+            var remRatio = ((pointsRem / targetPointsRem) * 125).toFixed(0);
+            $("#longArrow").css("margin-left",""+remRatio+"px")
+        }
 }
 
 //Functions used to generate difference in days between now and start of the year
@@ -117,7 +127,12 @@ function getDateDifference(){
     }
     if(today.getFullYear() == 2018){
         var startDate = new Date(2018,0,8);
-        dateDifference = dayDiff(today,startDate) -1;
+        if(dayDiff(today,startDate) < 0){
+            dateDifference = 0;
+        }
+        else{
+            dateDifference = dayDiff(today,startDate) -1;
+        }
         if(greaterThanDay(today,new Date(2018,2,9)) && greaterThanDay(new Date(2018,2,19),today)){
             dateDifference = dayDiff(new Date(2018,2,9),startDate) - 1;
         }
